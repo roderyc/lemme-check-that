@@ -6,10 +6,12 @@ from simplejson import loads
 import smtplib
 import sys
 from urllib2 import urlopen
+from urlparse import urlparse
 from uuid import uuid4
 
-BEANSTALK_HOST = os.environ.get("BEANSTALK_HOST")
-BEANSTALK_PORT = int(os.environ.get("BEANSTALK_PORT"))
+BEANSTALK_URL = urlparse(os.environ.get("BEANSTALK_URL"))
+BEANSTALK_HOST = BEANSTALK_URL.hostname
+BEANSTALK_PORT = BEANSTALK_URL.port
 CHECK_URL = os.environ.get("CHECK_URL")
 CHECK_SELECTOR = os.environ.get("CHECK_SELECTOR")
 SMTP_HOST = os.environ.get("SMTP_HOST")
