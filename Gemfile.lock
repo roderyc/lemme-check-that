@@ -1,0 +1,16 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    beanstalk-client (1.1.1)
+    clockwork (0.3.4)
+    json_pure (1.6.4)
+    stalker (0.9.0)
+      beanstalk-client
+      json_pure
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  clockwork (~> 0.3.4)
+  stalker (~> 0.9.0)
