@@ -1,4 +1,5 @@
 import beanstalkc
+from email.mime.text import MIMEText
 import os
 from pyquery import PyQuery as pq
 from simplejson import loads
@@ -43,8 +44,11 @@ class Notifier(object):
 
   def notify(self, result):
     message = "Change in selector \"%s\" for url \"%s\". Had %s elements, now %s."
-    message = message % (CHECK_SELECTOR, CHECK_URL, result[1], result[0])
-    self.s.sendmail(FROM_ADDRESS, NOTIFY_RECIPIENTS, message)
+    message = MIMEText(message % (CHECK_SELECTOR, CHECK_URL, result[1], result[0]))
+    message["Subject"] = "[lemme-check-that] Change in \"%s\"" % CHECK_SELECTOR
+    message["From"] = FROM_ADDRESS
+    message["To"] = ", ".join(NOTIFY_RECIPIENTS)
+    self.s.sendmail(FROM_ADDRESS, NOTIFY_RECIPIENTS, message.as_string())
 
 if __name__ == "__main__":
   beanstalk = beanstalkc.Connection(host=BEANSTALK_HOST, port=BEANSTALK_PORT)
