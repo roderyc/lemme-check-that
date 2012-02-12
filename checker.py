@@ -40,24 +40,20 @@ class Checker(object):
       self.old_num = num
       return (num, old_old)
 
-class Notifier(object):
-  def __init__(self):
-    self.s = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
-
-  def notify(self, result):
-    message = "Change in selector \"%s\" for url \"%s\". Had %s elements, now %s."
-    message = MIMEText(message % (CHECK_SELECTOR, CHECK_URL, result[1], result[0]))
-    message["Subject"] = "[lemme-check-that] Change in \"%s\"" % CHECK_SELECTOR
-    message["From"] = FROM_ADDRESS
-    message["To"] = ", ".join(NOTIFY_RECIPIENTS)
-    self.s.sendmail(FROM_ADDRESS, NOTIFY_RECIPIENTS, message.as_string())
+def notify(result):
+  s = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
+  message = "Change in selector \"%s\" for url \"%s\". Had %s elements, now %s."
+  message = MIMEText(message % (CHECK_SELECTOR, CHECK_URL, result[1], result[0]))
+  message["Subject"] = "[lemme-check-that] Change in \"%s\"" % CHECK_SELECTOR
+  message["From"] = FROM_ADDRESS
+  message["To"] = ", ".join(NOTIFY_RECIPIENTS)
+  s.sendmail(FROM_ADDRESS, NOTIFY_RECIPIENTS, message.as_string())
 
 if __name__ == "__main__":
   beanstalk = beanstalkc.Connection(host=BEANSTALK_HOST, port=BEANSTALK_PORT)
   beanstalk.watch("lemme-check-that")
   beanstalk.ignore("default")
   checker = Checker()
-  notifier = Notifier()
   running = True
 
   while running:
@@ -73,7 +69,7 @@ if __name__ == "__main__":
     result = checker.check()
     if result:
       print "Telling the recipients there was a change."
-      notifier.notify(result)
+      notify(result)
 
   print "Shutting down."
   sys.exit()
